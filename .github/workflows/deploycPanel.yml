@@ -1,36 +1,30 @@
-name: Publish Website to CPanel
+name: Deploy Website to cPanel
 on:
   push:
     branches:
       - salistack
       - main
 jobs:
-  FTP-Deploy-Action:
-    name: FTP-Deploy-Action
+  deploy:
+    name: Deploy to cPanel
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
     
-    - name: Debug Server Connection
-      run: |
-        echo "Testing server connectivity..."
-        echo "Testing: server.dhanvisultratek.com"
-        nslookup server.dhanvisultratek.com || echo "DNS lookup failed for server.dhanvisultratek.com"
-        echo "Testing alternative: dhanvisultratek.com"
-        nslookup dhanvisultratek.com || echo "DNS lookup failed for dhanvisultratek.com"
-        echo "Testing alternative: ftp.dhanvisultratek.com"
-        nslookup ftp.dhanvisultratek.com || echo "DNS lookup failed for ftp.dhanvisultratek.com"
-        
-    - name: FTP Deploy
-      uses: SamKirkland/FTP-Deploy-Action@4.3.3
+    - name: Deploy via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
-        server: ${{ secrets.FTP_SERVER }}
+        server: dhanvisultratek.com
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./v1.0/
         server-dir: /public_html/
-        port: 21
-        protocol: ftp
-        log-level: verbose
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.DS_Store
+          **/Thumbs.db
