@@ -14,9 +14,10 @@ jobs:
     
     - name: Fast Deploy Core Files
       run: |
-        curl -T index.php ftp://dhanvisultratek.com/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl -T about.php ftp://dhanvisultratek.com/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl -T contact.php ftp://dhanvisultratek.com/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl -T services.php ftp://dhanvisultratek.com/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl --ftp-create-dirs -T css/style.css ftp://dhanvisultratek.com/css/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl --ftp-create-dirs -T js/init.js ftp://dhanvisultratek.com/js/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T index.php ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T about.php ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T contact.php ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T services.php ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T css/style.css ftp://dhanvisultratek.com/public_html/css/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T js/init.js ftp://dhanvisultratek.com/public_html/js/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T .htaccess ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
