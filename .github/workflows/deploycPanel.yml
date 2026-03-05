@@ -12,18 +12,12 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
     
-    - name: Install lftp
-      run: sudo apt-get update && sudo apt-get install -y lftp
-    
-    - name: Deploy to cPanel via LFTP
-      run: |
-        lftp -f "
-        set ssl:verify-certificate false
-        set ftp:ssl-allow false
-        set ftp:passive-mode true
-        set cmd:fail-exit true
-        open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} dhanvisultratek.com
-        cd public_html
-        mirror --reverse --delete --verbose --parallel=3 --exclude-glob=.git* --exclude-glob=.github* --exclude-glob=README.md --exclude-glob=*.md --exclude-glob=.ftpignore ./ ./
-        bye
-        "
+    - name: Deploy to cPanel
+      uses: airvzxf/ftp-deployment-action@latest
+      with:
+        server: dhanvisultratek.com
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local_dir: ./
+        remote_dir: /public_html
+        delete: false
