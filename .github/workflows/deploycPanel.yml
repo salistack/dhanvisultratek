@@ -2,7 +2,6 @@ name: Publish Website to CPanel
 on:
   push:
     branches:
-      - main
       - salistack
 jobs:
   FTP-Deploy-Action:
