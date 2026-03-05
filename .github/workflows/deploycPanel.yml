@@ -14,17 +14,21 @@ jobs:
       with:
         fetch-depth: 0
     
-    - name: Deploy via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
       with:
-        server: dhanvisultratek.com
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./v1.0/
-        server-dir: /public_html/
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          **/.DS_Store
-          **/Thumbs.db
+        node-version: '18'
+    
+    - name: Install FTP Deploy Tool
+      run: |
+        npm install -g @samkirkland/ftp-deploy
+    
+    - name: Deploy to cPanel via FTP
+      run: |
+        npx ftp-deploy --server "dhanvisultratek.com" \
+                       --username "${{ secrets.FTP_USERNAME }}" \
+                       --password "${{ secrets.FTP_PASSWORD }}" \
+                       --local-dir "./v1.0/" \
+                       --server-dir "/public_html/" \
+                       --verbose \
+                       --exclude "**/.git*" "**/.git*/**" "**/node_modules/**" "**/.DS_Store" "**/Thumbs.db"
