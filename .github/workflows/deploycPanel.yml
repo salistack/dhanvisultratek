@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - salistack
+      - main
 jobs:
   FTP-Deploy-Action:
     name: FTP-Deploy-Action
@@ -10,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 2
+        fetch-depth: 0
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.3.5
       with:
@@ -18,3 +19,5 @@ jobs:
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
         local-dir: ./v1.0/
+        server-dir: ./
+        log-level: verbose
