@@ -4,6 +4,8 @@ on:
     branches:
       - salistack
       - main
+  workflow_dispatch:  # Manual trigger from GitHub Actions tab
+
 jobs:
   deploy:
     name: Deploy to cPanel
@@ -11,13 +13,28 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v4
-    
-    - name: Fast Deploy Core Files
+
+    - name: Install lftp
+      run: sudo apt-get update && sudo apt-get install -y lftp
+
+    - name: Deploy ALL files via LFTP
       run: |
-        curl --ftp-create-dirs -T index.php ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl --ftp-create-dirs -T about.php ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl --ftp-create-dirs -T contact.php ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl --ftp-create-dirs -T services.php ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl --ftp-create-dirs -T css/style.css ftp://dhanvisultratek.com/public_html/css/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl --ftp-create-dirs -T js/init.js ftp://dhanvisultratek.com/public_html/js/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
-        curl --ftp-create-dirs -T .htaccess ftp://dhanvisultratek.com/public_html/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        lftp -f "
+        set ssl:verify-certificate false
+        set ftp:ssl-allow false
+        open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} ftp.dhanvisultratek.com
+        mirror --reverse --delete --verbose \
+          --exclude-glob .git/ \
+          --exclude-glob .git* \
+          --exclude-glob .github/ \
+          --exclude-glob README.md \
+          --exclude-glob *.md \
+          --exclude-glob deploy-manual.bat \
+          --exclude-glob deploy-manual.sh \
+          --exclude-glob .ftpignore \
+          --exclude-glob node_modules/ \
+          --exclude-glob .env \
+          --exclude-glob .env.local \
+          ./ /public_html/
+        bye
+        "
