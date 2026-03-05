@@ -15,23 +15,13 @@ jobs:
     - name: Install lftp
       run: sudo apt-get update && sudo apt-get install -y lftp
     
-    - name: Test FTP Connection and Find Directory
+    - name: Deploy to Public HTML Directory
       run: |
         lftp -f "
         set ssl:verify-certificate false
         set ftp:ssl-allow false
         open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} dhanvisultratek.com
-        pwd
-        ls -la
-        bye
-        "
-    
-    - name: Deploy to cPanel Root Directory
-      run: |
-        lftp -f "
-        set ssl:verify-certificate false
-        set ftp:ssl-allow false
-        open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} dhanvisultratek.com
-        mirror --reverse --delete --verbose --exclude-glob .git* --exclude-glob .github* --exclude-glob README.md --exclude-glob *.md ./ ./
+        cd public_html
+        mirror --reverse --delete --verbose --exclude-glob .git* --exclude-glob .github* --exclude-glob README.md --exclude-glob *.md --exclude-glob .ftpignore ./ ./
         bye
         "
