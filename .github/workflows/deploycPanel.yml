@@ -12,18 +12,18 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
     
-    - name: Deploy via FTP
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-      with:
-        server: ${{ secrets.FTP_SERVER }}
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./
-        server-dir: /public_html/
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/.github/**
-          **/README.md
-          **/*.md
-          **/.ftpignore
+    - name: Install lftp
+      run: sudo apt-get update && sudo apt-get install -y lftp
+    
+    - name: Deploy to cPanel via LFTP
+      run: |
+        lftp -f "
+        set ssl:verify-certificate false
+        set ftp:ssl-allow false
+        set ftp:passive-mode true
+        set cmd:fail-exit true
+        open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} dhanvisultratek.com
+        cd public_html
+        mirror --reverse --delete --verbose --parallel=3 --exclude-glob=.git* --exclude-glob=.github* --exclude-glob=README.md --exclude-glob=*.md --exclude-glob=.ftpignore ./ ./
+        bye
+        "
