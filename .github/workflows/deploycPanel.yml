@@ -15,13 +15,28 @@ jobs:
     - name: Install lftp
       run: sudo apt-get update && sudo apt-get install -y lftp
     
-    - name: Deploy to Public HTML Directory
+    - name: Test FTP Connection and Directory Structure
       run: |
         lftp -f "
         set ssl:verify-certificate false
         set ftp:ssl-allow false
         open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} dhanvisultratek.com
-        cd public_html
+        pwd
+        ls -la
+        cd public_html || echo 'public_html not found, checking other directories'
+        pwd
+        ls -la
+        bye
+        "
+    
+    - name: Deploy to Public HTML Directory  
+      run: |
+        lftp -f "
+        set ssl:verify-certificate false
+        set ftp:ssl-allow false
+        open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} dhanvisultratek.com
+        lcd .
+        cd public_html || (echo 'Creating public_html directory' && mkdir public_html && cd public_html)
         mirror --reverse --delete --verbose --exclude-glob .git* --exclude-glob .github* --exclude-glob README.md --exclude-glob *.md --exclude-glob .ftpignore ./ ./
         bye
         "
