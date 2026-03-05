@@ -12,12 +12,11 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
     
-    - name: Deploy to cPanel
-      uses: airvzxf/ftp-deployment-action@latest
-      with:
-        server: dhanvisultratek.com
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local_dir: ./
-        remote_dir: /
-        delete: false
+    - name: Fast Deploy Core Files
+      run: |
+        curl -T index.php ftp://dhanvisultratek.com/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl -T about.php ftp://dhanvisultratek.com/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl -T contact.php ftp://dhanvisultratek.com/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl -T services.php ftp://dhanvisultratek.com/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T css/style.css ftp://dhanvisultratek.com/css/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
+        curl --ftp-create-dirs -T js/init.js ftp://dhanvisultratek.com/js/ -u ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}
