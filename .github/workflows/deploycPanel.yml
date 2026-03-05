@@ -35,6 +35,6 @@ jobs:
           --exclude-glob node_modules/ \
           --exclude-glob .env \
           --exclude-glob .env.local \
-          ./ public_html/
+          ./ ./
         bye
         "
