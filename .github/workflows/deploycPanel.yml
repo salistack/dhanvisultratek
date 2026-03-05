@@ -12,12 +12,25 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - name: SFTP-Deploy-Action
-      uses: wlixcc/SFTP-Deploy-Action@v1.2.4
+    
+    - name: Debug Server Connection
+      run: |
+        echo "Testing server connectivity..."
+        echo "Testing: server.dhanvisultratek.com"
+        nslookup server.dhanvisultratek.com || echo "DNS lookup failed for server.dhanvisultratek.com"
+        echo "Testing alternative: dhanvisultratek.com"
+        nslookup dhanvisultratek.com || echo "DNS lookup failed for dhanvisultratek.com"
+        echo "Testing alternative: ftp.dhanvisultratek.com"
+        nslookup ftp.dhanvisultratek.com || echo "DNS lookup failed for ftp.dhanvisultratek.com"
+        
+    - name: FTP Deploy
+      uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        local_path: './v1.0/*'
-        remote_path: '/public_html/'
-        sftpArgs: '-o ConnectTimeout=5'
+        local-dir: ./v1.0/
+        server-dir: /public_html/
+        port: 21
+        protocol: ftp
+        log-level: verbose
