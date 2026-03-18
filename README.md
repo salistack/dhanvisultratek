@@ -9,9 +9,9 @@ This repository supports two deployment targets:
 1. GitHub Pages (recommended)
 2. cPanel FTP deployment
 
-### GitHub Pages (main branch)
+### GitHub Pages (main and salistack branches)
 
-When you push to `main`, GitHub Actions renders all top-level PHP pages into static HTML and deploys them to GitHub Pages.
+When you push to `main` or `salistack`, GitHub Actions renders all top-level PHP pages into static HTML and deploys them to GitHub Pages.
 
 - Workflow: `.github/workflows/deploy-github-pages.yml`
 - Output folder: `_site/`
