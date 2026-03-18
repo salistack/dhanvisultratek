@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - salistack
-      - main
   workflow_dispatch:  # Manual trigger from GitHub Actions tab
 
 jobs:

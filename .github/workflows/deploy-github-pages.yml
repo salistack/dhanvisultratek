@@ -1,0 +1,82 @@
+name: Deploy Website to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install PHP CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli rsync
+
+      - name: Build static site from PHP
+        run: |
+          set -euo pipefail
+
+          rm -rf _site
+          mkdir -p _site
+
+          # Copy static assets and non-PHP files
+          rsync -av ./ _site/ \
+            --exclude ".git/" \
+            --exclude ".github/" \
+            --exclude "*.php" \
+            --exclude "README.md" \
+            --exclude "deploy-manual.bat" \
+            --exclude "deploy-manual.sh"
+
+          # Render top-level PHP pages into static HTML pages
+          for file in *.php; do
+            if [ "$file" = "config.php" ]; then
+              continue
+            fi
+            php "$file" > "_site/${file%.php}.html"
+          done
+
+          # Rewrite internal links from .php to .html in rendered pages
+          find _site -type f -name "*.html" -print0 | while IFS= read -r -d '' page; do
+            sed -E -i \
+              -e 's/href="([^"]+)\.php([#?][^"]*)?"/href="\1.html\2"/g' \
+              -e 's/action="([^"]+)\.php([#?][^"]*)?"/action="\1.html\2"/g' \
+              "$page"
+          done
+
+          # Ensure GitHub Pages serves folders/files directly without Jekyll processing
+          touch _site/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
