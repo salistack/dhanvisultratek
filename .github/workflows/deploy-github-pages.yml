@@ -47,13 +47,19 @@ jobs:
             --exclude "deploy-manual.bat" \
             --exclude "deploy-manual.sh"
 
+          # Copy config.php temporarily so includes work during rendering
+          cp config.php _site/config.php
+
           # Render top-level PHP pages into static HTML pages
           for file in *.php; do
             if [ "$file" = "config.php" ]; then
               continue
             fi
-            php "$file" > "_site/${file%.php}.html"
+            php -d display_errors=0 "$file" > "_site/${file%.php}.html" 2>/dev/null || echo "Warning: Failed to render $file"
           done
+
+          # Clean up PHP files from output
+          find _site -type f -name "*.php" -delete
 
           # Rewrite internal links from .php to .html in rendered pages
           find _site -type f -name "*.html" -print0 | while IFS= read -r -d '' page; do
